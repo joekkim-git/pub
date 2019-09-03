@@ -1,0 +1,2265 @@
+swagger: '2.0'
+info:
+  title: DAML Ledger API (REST)
+  version: v1
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/ActiveContractsService/GetActiveContracts:
+    post:
+      summary: |-
+        Returns a stream of the latest snapshot of active contracts. Getting an empty stream means that the active contracts set is empty and the client should listen to transactions using ``LEDGER_BEGIN``.
+        Clients SHOULD NOT assume that the set of active contracts they receive reflects the state at the ledger end.
+      operationId: GetActiveContracts
+      responses:
+        '200':
+          description: A successful response.(streaming responses)
+          schema:
+            $ref: '#/x-stream-definitions/v1GetActiveContractsResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetActiveContractsRequest'
+      tags:
+        - ActiveContractsService
+  /v1/CommandCompletionService/CompletionEnd:
+    post:
+      summary: Returns the offset after the latest completion.
+      operationId: CompletionEnd
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1CompletionEndResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1CompletionEndRequest'
+      tags:
+        - CommandCompletionService
+  /v1/CommandCompletionService/CompletionStream:
+    post:
+      summary: Subscribe to command completion events.
+      operationId: CompletionStream
+      responses:
+        '200':
+          description: A successful response.(streaming responses)
+          schema:
+            $ref: '#/x-stream-definitions/v1CompletionStreamResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1CompletionStreamRequest'
+      tags:
+        - CommandCompletionService
+  /v1/CommandService/SubmitAndWait:
+    post:
+      summary: |-
+        Submits a single composite command and waits for its result.
+        Returns ``RESOURCE_EXHAUSTED`` if the number of in-flight commands reached the maximum (if a limit is configured).
+        Propagates the gRPC error of failed submissions including DAML interpretation errors.
+      operationId: SubmitAndWait
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            properties: {}
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1SubmitAndWaitRequest'
+      tags:
+        - CommandService
+  /v1/CommandService/SubmitAndWaitForTransaction:
+    post:
+      summary: |-
+        Submits a single composite command, waits for its result, and returns the transaction.
+        Returns ``RESOURCE_EXHAUSTED`` if the number of in-flight commands reached the maximum (if a limit is configured).
+        Propagates the gRPC error of failed submissions including DAML interpretation errors.
+      operationId: SubmitAndWaitForTransaction
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1SubmitAndWaitForTransactionResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1SubmitAndWaitRequest'
+      tags:
+        - CommandService
+  /v1/CommandService/SubmitAndWaitForTransactionId:
+    post:
+      summary: |-
+        Submits a single composite command, waits for its result, and returns the transaction id.
+        Returns ``RESOURCE_EXHAUSTED`` if the number of in-flight commands reached the maximum (if a limit is configured).
+        Propagates the gRPC error of failed submissions including DAML interpretation errors.
+      operationId: SubmitAndWaitForTransactionId
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1SubmitAndWaitForTransactionIdResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1SubmitAndWaitRequest'
+      tags:
+        - CommandService
+  /v1/CommandService/SubmitAndWaitForTransactionTree:
+    post:
+      summary: |-
+        Submits a single composite command, waits for its result, and returns the transaction tree.
+        Returns ``RESOURCE_EXHAUSTED`` if the number of in-flight commands reached the maximum (if a limit is configured).
+        Propagates the gRPC error of failed submissions including DAML interpretation errors.
+      operationId: SubmitAndWaitForTransactionTree
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1SubmitAndWaitForTransactionTreeResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1SubmitAndWaitRequest'
+      tags:
+        - CommandService
+  /v1/CommandSubmissionService/Submit:
+    post:
+      summary: Submit a single composite command.
+      operationId: Submit
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            properties: {}
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1SubmitRequest'
+      tags:
+        - CommandSubmissionService
+  /v1/LedgerConfigurationService/GetLedgerConfiguration:
+    post:
+      summary: 'Returns the latest configuration as the first response, and publishes configuration updates in the same stream.'
+      operationId: GetLedgerConfiguration
+      responses:
+        '200':
+          description: A successful response.(streaming responses)
+          schema:
+            $ref: '#/x-stream-definitions/v1GetLedgerConfigurationResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetLedgerConfigurationRequest'
+      tags:
+        - LedgerConfigurationService
+  /v1/LedgerIdentityService/GetLedgerIdentity:
+    post:
+      summary: Clients may call this RPC to return the identifier of the ledger they are connected to.
+      operationId: GetLedgerIdentity
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetLedgerIdentityResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetLedgerIdentityRequest'
+      tags:
+        - LedgerIdentityService
+  /v1/PackageManagementService/ListKnownPackages:
+    post:
+      summary: |-
+        Returns the details of all DAML-LF packages known to the backing
+        participant.
+        This request will always succeed.
+      operationId: ListKnownPackages
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/adminListKnownPackagesResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/adminListKnownPackagesRequest'
+      tags:
+        - PackageManagementService
+  /v1/PackageManagementService/UploadDarFile:
+    post:
+      summary: |-
+        Upload a DAR file to the backing participant.
+        Depending on the ledger implementation this might also make the package 
+        available on the whole ledger. This call might not be supported by some 
+        ledger implementations. Canton could be an example, where uploading a DAR
+        is not sufficient to render it usable, it must be activated first.
+        This call may:
+        - Succeed, if the package was successfully uploaded, or if the same package
+          was already uploaded before. 
+        - Respond with UNIMPLEMENTED, if DAR package uploading is not supported by
+          the backing participant.
+        - Respond with INVALID_ARGUMENT, if the DAR file is too big or malformed.
+        The maximum supported size is implementation specific.
+      operationId: UploadDarFile
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/adminUploadDarFileResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/adminUploadDarFileRequest'
+      tags:
+        - PackageManagementService
+  /v1/PackageService/GetPackage:
+    post:
+      summary: 'Returns the contents of a single package, or a ``NOT_FOUND`` error if the requested package is unknown.'
+      operationId: GetPackage
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetPackageResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetPackageRequest'
+      tags:
+        - PackageService
+  /v1/PackageService/GetPackageStatus:
+    post:
+      summary: Returns the status of a single package.
+      operationId: GetPackageStatus
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetPackageStatusResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetPackageStatusRequest'
+      tags:
+        - PackageService
+  /v1/PackageService/ListPackages:
+    post:
+      summary: Returns the identifiers of all supported packages.
+      operationId: ListPackages
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1ListPackagesResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1ListPackagesRequest'
+      tags:
+        - PackageService
+  /v1/PartyManagementService/AllocateParty:
+    post:
+      summary: |-
+        Adds a new party to the set managed by the backing participant.
+        Caller specifies a party identifier suggestion, the actual identifier
+        allocated might be different and is implementation specific.
+        This call may:
+        - Succeed, in which case the actual allocated identifier is visible in
+          the response.
+        - Respond with UNIMPLEMENTED if synchronous party allocation is not
+          supported by the backing participant.
+        - Respond with INVALID_ARGUMENT if the provided hint and/or display name
+          is invalid on the given ledger (see below).
+        daml-on-sql: suggestion's uniqueness is checked and call rejected if the
+        identifier is already present
+        daml-on-kv-ledger: suggestion's uniqueness is checked by the validators in
+        the consensus layer and call rejected if the identifier is already present.
+        canton: completely different globally unique identifier is allocated.
+        Behind the scenes calls to an internal protocol are made. As that protocol
+        is richer than the the surface protocol, the arguments take implicit values
+      operationId: AllocateParty
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/adminAllocatePartyResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/adminAllocatePartyRequest'
+      tags:
+        - PartyManagementService
+  /v1/PartyManagementService/GetParticipantId:
+    post:
+      summary: |-
+        Return the identifier of the backing participant.
+        All horizontally scaled replicas should return the same id.
+        This method is expected to succeed provided the backing participant is 
+        healthy, otherwise it responds with INTERNAL grpc error.
+        daml-on-sql: returns an identifier supplied on command line at launch time
+        daml-on-kv-ledger: as above
+        canton: returns globally unique identifier of the backing participant
+      operationId: GetParticipantId
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/adminGetParticipantIdResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/adminGetParticipantIdRequest'
+      tags:
+        - PartyManagementService
+  /v1/PartyManagementService/ListKnownParties:
+    post:
+      summary: |-
+        List the parties known by the backing participant.
+        The list returned contains parties whose ledger access is facilitated by
+        backing participant and the ones maintained elsewhere.
+        This request will always succeed.
+      operationId: ListKnownParties
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/adminListKnownPartiesResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/adminListKnownPartiesRequest'
+      tags:
+        - PartyManagementService
+  /v1/ResetService/Reset:
+    post:
+      summary: |-
+        Resets the ledger state. Note that loaded DARs won't be removed -- this only rolls back the
+        ledger to genesis.
+      operationId: Reset
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            properties: {}
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/testingResetRequest'
+      tags:
+        - ResetService
+  /v1/TimeService/GetTime:
+    post:
+      summary: |-
+        Returns a stream of time updates.
+        Always returns at least one response, where the first one is the current time.
+        Subsequent responses are emitted whenever the ledger server's time is updated.
+      operationId: GetTime
+      responses:
+        '200':
+          description: A successful response.(streaming responses)
+          schema:
+            $ref: '#/x-stream-definitions/testingGetTimeResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/testingGetTimeRequest'
+      tags:
+        - TimeService
+  /v1/TimeService/SetTime:
+    post:
+      summary: Allows clients to change the ledger's clock in an atomic get-and-set operation.
+      operationId: SetTime
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            properties: {}
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/testingSetTimeRequest'
+      tags:
+        - TimeService
+  /v1/TransactionService/GetFlatTransactionByEventId:
+    post:
+      summary: |-
+        Lookup a transaction by the ID of an event that appears within it.
+        Returns ``NOT_FOUND`` if no such transaction exists.
+      operationId: GetFlatTransactionByEventId
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetFlatTransactionResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetTransactionByEventIdRequest'
+      tags:
+        - TransactionService
+  /v1/TransactionService/GetFlatTransactionById:
+    post:
+      summary: |-
+        Lookup a transaction by its ID.
+        Returns ``NOT_FOUND`` if no such transaction exists.
+      operationId: GetFlatTransactionById
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetFlatTransactionResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetTransactionByIdRequest'
+      tags:
+        - TransactionService
+  /v1/TransactionService/GetLedgerEnd:
+    post:
+      summary: |-
+        Get the current ledger end.
+        Subscriptions started with the returned offset will serve transactions created after this RPC was called.
+      operationId: GetLedgerEnd
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetLedgerEndResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetLedgerEndRequest'
+      tags:
+        - TransactionService
+  /v1/TransactionService/GetTransactionByEventId:
+    post:
+      summary: |-
+        Lookup a transaction tree by the ID of an event that appears within it.
+        Returns ``NOT_FOUND`` if no such transaction exists.
+        For looking up a transaction instead of a transaction tree, please see GetFlatTransactionByEventId
+      operationId: GetTransactionByEventId
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetTransactionResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetTransactionByEventIdRequest'
+      tags:
+        - TransactionService
+  /v1/TransactionService/GetTransactionById:
+    post:
+      summary: |-
+        Lookup a transaction tree by its ID.
+        Returns ``NOT_FOUND`` if no such transaction exists.
+        For looking up a transaction instead of a transaction tree, please see GetFlatTransactionById
+      operationId: GetTransactionById
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v1GetTransactionResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetTransactionByIdRequest'
+      tags:
+        - TransactionService
+  /v1/TransactionService/GetTransactionTrees:
+    post:
+      summary: Read the ledger's complete transaction tree stream for a set of parties.
+      operationId: GetTransactionTrees
+      responses:
+        '200':
+          description: A successful response.(streaming responses)
+          schema:
+            $ref: '#/x-stream-definitions/v1GetTransactionTreesResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetTransactionsRequest'
+      tags:
+        - TransactionService
+  /v1/TransactionService/GetTransactions:
+    post:
+      summary: Read the ledger's filtered transaction stream for a set of parties.
+      operationId: GetTransactions
+      responses:
+        '200':
+          description: A successful response.(streaming responses)
+          schema:
+            $ref: '#/x-stream-definitions/v1GetTransactionsResponse'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/v1GetTransactionsRequest'
+      tags:
+        - TransactionService
+definitions:
+  MapEntry:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
+        $ref: '#/definitions/v1Value'
+  protobufAny:
+    type: object
+    properties:
+      type_url:
+        type: string
+        description: |-
+          A URL/resource name that uniquely identifies the type of the serialized
+          protocol buffer message. This string must contain at least
+          one "/" character. The last segment of the URL's path must represent
+          the fully qualified name of the type (as in
+          `path/google.protobuf.Duration`). The name should be in a canonical form
+          (e.g., leading "." is not accepted).
+
+          In practice, teams usually precompile into the binary all types that they
+          expect it to use in the context of Any. However, for URLs which use the
+          scheme `http`, `https`, or no scheme, one can optionally set up a type
+          server that maps type URLs to message definitions as follows:
+
+          * If no scheme is provided, `https` is assumed.
+          * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+            value in binary format, or produce an error.
+          * Applications are allowed to cache lookup results based on the
+            URL, or have them precompiled into a binary to avoid any
+            lookup. Therefore, binary compatibility needs to be preserved
+            on changes to types. (Use versioned type names to manage
+            breaking changes.)
+
+          Note: this functionality is not currently available in the official
+          protobuf release, and it is not used for type URLs beginning with
+          type.googleapis.com.
+
+          Schemes other than `http`, `https` (or the empty scheme) might be
+          used with implementation specific semantics.
+      value:
+        type: string
+        format: byte
+        description: Must be a valid serialized protocol buffer of the above specified type.
+    description: |-
+      `Any` contains an arbitrary serialized protocol buffer message along with a
+      URL that describes the type of the serialized message.
+
+      Protobuf library provides support to pack/unpack Any values in the form
+      of utility functions or additional generated methods of the Any type.
+
+      Example 1: Pack and unpack a message in C++.
+
+          Foo foo = ...;
+          Any any;
+          any.PackFrom(foo);
+          ...
+          if (any.UnpackTo(&foo)) {
+            ...
+          }
+
+      Example 2: Pack and unpack a message in Java.
+
+          Foo foo = ...;
+          Any any = Any.pack(foo);
+          ...
+          if (any.is(Foo.class)) {
+            foo = any.unpack(Foo.class);
+          }
+
+       Example 3: Pack and unpack a message in Python.
+
+          foo = Foo(...)
+          any = Any()
+          any.Pack(foo)
+          ...
+          if any.Is(Foo.DESCRIPTOR):
+            any.Unpack(foo)
+            ...
+
+       Example 4: Pack and unpack a message in Go
+
+           foo := &pb.Foo{...}
+           any, err := ptypes.MarshalAny(foo)
+           ...
+           foo := &pb.Foo{}
+           if err := ptypes.UnmarshalAny(any, foo); err != nil {
+             ...
+           }
+
+      The pack methods provided by protobuf library will by default use
+      'type.googleapis.com/full.type.name' as the type URL and the unpack
+      methods only use the fully qualified type name after the last '/'
+      in the type URL, for example "foo.bar.com/x/y.z" will yield type
+      name "y.z".
+
+
+      JSON
+      ====
+      The JSON representation of an `Any` value uses the regular
+      representation of the deserialized, embedded message, with an
+      additional field `@type` which contains the type URL. Example:
+
+          package google.profile;
+          message Person {
+            string first_name = 1;
+            string last_name = 2;
+          }
+
+          {
+            "@type": "type.googleapis.com/google.profile.Person",
+            "firstName": <string>,
+            "lastName": <string>
+          }
+
+      If the embedded message type is well-known and has a custom JSON
+      representation, that representation will be embedded adding a field
+      `value` which holds the custom JSON in addition to the `@type`
+      field. Example (for message [google.protobuf.Duration][]):
+
+          {
+            "@type": "type.googleapis.com/google.protobuf.Duration",
+            "value": "1.212s"
+          }
+  runtimeStreamError:
+    type: object
+    properties:
+      grpc_code:
+        type: integer
+        format: int32
+      http_code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      http_status:
+        type: string
+      details:
+        type: array
+        items:
+          $ref: '#/definitions/protobufAny'
+  rpcStatus:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: |-
+          The status code, which should be an enum value of
+          [google.rpc.Code][google.rpc.Code].
+      message:
+        type: string
+        description: |-
+          A developer-facing error message, which should be in English. Any
+          user-facing error message should be localized and sent in the
+          [google.rpc.Status.details][google.rpc.Status.details] field, or localized
+          by the client.
+      details:
+        type: array
+        items:
+          $ref: '#/definitions/protobufAny'
+        description: |-
+          A list of messages that carry the error details.  There is a common set of
+          message types for APIs to use.
+    description: |-
+      - Simple to use and understand for most users
+      - Flexible enough to meet unexpected needs
+
+
+      The `Status` message contains three pieces of data: error code, error
+      message, and error details. The error code should be an enum value of
+      [google.rpc.Code][google.rpc.Code], but it may accept additional error codes
+      if needed.  The error message should be a developer-facing English message
+      that helps developers *understand* and *resolve* the error. If a localized
+      user-facing error message is needed, put the localized message in the error
+      details or localize it in the client. The optional error details may contain
+      arbitrary information about the error. There is a predefined set of error
+      detail types in the package `google.rpc` that can be used for common error
+      conditions.
+
+
+      The `Status` message is the logical representation of the error model, but it
+      is not necessarily the actual wire format. When the `Status` message is
+      exposed in different client libraries and different wire protocols, it can be
+      mapped differently. For example, it will likely be mapped to some exceptions
+      in Java, but more likely mapped to some error codes in C.
+
+
+      The error model and the `Status` message can be used in a variety of
+      environments, either with or without APIs, to provide a
+      consistent developer experience across different environments.
+
+      Example uses of this error model include:
+
+      - Partial errors. If a service needs to return partial errors to the client,
+          it may embed the `Status` in the normal response to indicate the partial
+          errors.
+
+      - Workflow errors. A typical workflow has multiple steps. Each step may
+          have a `Status` message for error reporting.
+
+      - Batch operations. If a client uses batch request and batch response, the
+          `Status` message should be used directly inside batch response, one for
+          each error sub-response.
+
+      - Asynchronous operations. If an API call embeds asynchronous operation
+          results in its response, the status of those operations should be
+          represented directly using the `Status` message.
+
+      - Logging. If some API errors are stored in logs, the message `Status` could
+          be used directly after any stripping needed for security/privacy reasons.
+      
+      The `Status` type defines a logical error model that is suitable for
+      different programming environments, including REST APIs and RPC APIs. It is
+      used by [gRPC](https://github.com/grpc). The error model is designed to be:
+  v1CreatedEvent:
+    type: object
+    properties:
+      event_id:
+        type: string
+        title: |-
+          The ID of this particular event.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      contract_id:
+        type: string
+        title: |-
+          The ID of the created contract.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      template_id:
+        $ref: '#/definitions/v1Identifier'
+        title: |-
+          The template of the created contract.
+          Required
+      contract_key:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The key of the created contract, if defined.
+          Optional
+      create_arguments:
+        $ref: '#/definitions/v1Record'
+        title: |-
+          The arguments that have been used to create the contract.
+          Required
+      witness_parties:
+        type: array
+        items:
+          type: string
+        title: |-
+          The parties that are notified of this event. For `CreatedEvent`s,
+          these are the intersection of the stakeholders of the contract in
+          question and the parties specified in the `TransactionFilter`. The
+          stakeholders are the union of the signatories and the observers of
+          the contract.
+          Required
+      signatories:
+        type: array
+        items:
+          type: string
+        title: |-
+          The signatories for this contract as specified by the template.
+          Required
+      observers:
+        type: array
+        items:
+          type: string
+        title: |-
+          The observers for this contract as specified explicitly by the template or implicitly as choice controllers.
+          Required
+      agreement_text:
+        type: string
+        title: |-
+          The agreement text of the contract.
+          We use StringValue to properly reflect optionality on the wire for backwards compatibility.
+          This is necessary since the empty string is an acceptable (and in fact the default) agreement
+          text, but also the default string in protobuf.
+          This means a newer client works with an older sandbox seamlessly.
+          Optional
+    description: 'Records that a contract has been created, and choices may now be exercised on it.'
+  v1Enum:
+    type: object
+    properties:
+      enum_id:
+        $ref: '#/definitions/v1Identifier'
+        description: |-
+          Omitted from the transaction stream when verbose streaming is not enabled.
+          Optional when submitting commands.
+    description: A value with finite set of alternative representations.
+  v1Filters:
+    type: object
+    properties:
+      inclusive:
+        $ref: '#/definitions/v1InclusiveFilters'
+        title: |-
+          If not set, no filters will be applied.
+          Optional
+  v1GetActiveContractsRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      filter:
+        $ref: '#/definitions/v1TransactionFilter'
+        title: |-
+          Templates to include in the served snapshot, per party.
+          Required
+      verbose:
+        type: boolean
+        format: boolean
+        title: |-
+          If enabled, values served over the API will contain more information than strictly necessary to interpret the data.
+          In particular, setting the verbose flag to true triggers the ledger to include labels for record fields.
+          Optional
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetActiveContractsResponse:
+    type: object
+    properties:
+      offset:
+        type: string
+        title: |-
+          Included in the last message.
+          The client should start consuming the transactions endpoint with this offset.
+          The format of this field is described in ``ledger_offset.proto``.
+          Required
+      workflow_id:
+        type: string
+        title: |-
+          The workflow that created the contracts.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      active_contracts:
+        type: array
+        items:
+          $ref: '#/definitions/v1CreatedEvent'
+        title: |-
+          The list of contracts that were introduced by the workflow with ``workflow_id`` at the offset.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Zipkin trace context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1Identifier:
+    type: object
+    properties:
+      package_id:
+        type: string
+        title: |-
+          The identifier of the DAML package that contains the entity.
+          Must be a valid PackageIdString.
+          Required
+      module_name:
+        type: string
+        title: |-
+          The dot-separated module name of the identifier.
+          Required
+      entity_name:
+        type: string
+        title: |-
+          The dot-separated name of the entity (e.g. record, template, ...) within the module.
+          Required
+    description: Unique identifier of an entity.
+  v1InclusiveFilters:
+    type: object
+    properties:
+      template_ids:
+        type: array
+        items:
+          $ref: '#/definitions/v1Identifier'
+        title: |-
+          A collection of templates.
+          SHOULD NOT contain duplicates.
+          Required
+    description: 'If no internal fields are set, no data will be returned.'
+  v1List:
+    type: object
+    properties:
+      elements:
+        type: array
+        items:
+          $ref: '#/definitions/v1Value'
+        title: |-
+          The elements must all be of the same concrete value type.
+          Optional
+    description: A homogenous collection of values.
+  v1Map:
+    type: object
+    properties:
+      entries:
+        type: array
+        items:
+          $ref: '#/definitions/MapEntry'
+  v1Optional:
+    type: object
+    properties:
+      value:
+        $ref: '#/definitions/v1Value'
+    description: |-
+      Corresponds to Java's Optional type, Scala's Option, and Haskell's Maybe.
+      The reason why we need to wrap this in an additional ``message`` is that we
+      need to be able to encode the ``None`` case in the ``Value`` oneof.
+  v1Record:
+    type: object
+    properties:
+      record_id:
+        $ref: '#/definitions/v1Identifier'
+        description: |-
+          Omitted from the transaction stream when verbose streaming is not enabled.
+          Optional when submitting commands.
+      fields:
+        type: array
+        items:
+          $ref: '#/definitions/v1RecordField'
+        title: |-
+          The nested values of the record.
+          Required
+    description: Contains nested values.
+  v1RecordField:
+    type: object
+    properties:
+      label:
+        type: string
+        title: |-
+          When reading a transaction stream, it's omitted if verbose streaming is not enabled.
+          When submitting a commmand, it's optional:
+            - if all keys within a single record are present, the order in which fields appear does not matter. however, each key must appear exactly once.
+            - if any of the keys within a single record are omitted, the order of fields MUST match the order of declaration in the DAML template.
+          Must be a valid NameString
+      value:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          A nested value of a record.
+          Required
+    description: A named nested value within a record.
+  v1TraceContext:
+    type: object
+    properties:
+      trace_id_high:
+        type: string
+        format: uint64
+        description: 'If present, this is the high 64 bits of the 128-bit identifier. Otherwise the trace ID is 64 bits long.'
+      trace_id:
+        type: string
+        format: uint64
+        description: The TraceId is 64 or 128-bit in length and indicates the overall ID of the trace. Every span in a trace shares this ID.
+      span_id:
+        type: string
+        format: uint64
+        description: |-
+          The SpanId is 64-bit in length and indicates the position of the current operation in the trace tree.
+          The value should not be interpreted: it may or may not be derived from the value of the TraceId.
+      parent_span_id:
+        type: string
+        format: uint64
+        description: |-
+          The ParentSpanId is 64-bit in length and indicates the position of the parent operation in the trace tree.
+          When the span is the root of the trace tree, the ParentSpanId is absent.
+      sampled:
+        type: boolean
+        format: boolean
+        description: |-
+          When the sampled decision is accept, report this span to the tracing system. When it is reject, do not.
+          When B3 attributes are sent without a sampled decision, the receiver should make one.
+          Once the sampling decision is made, the same value should be consistently sent downstream.
+    description: |-
+      Data structure to propagate Zipkin trace information.
+      See https://github.com/openzipkin/b3-propagation
+      Trace identifiers are 64 or 128-bit, but all span identifiers within a trace are 64-bit. All identifiers are opaque.
+  v1TransactionFilter:
+    type: object
+    properties:
+      filters_by_party:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1Filters'
+        title: |-
+          Keys of the map determine which parties' on-ledger transactions are being queried.
+          Values of the map determine which events are disclosed in the stream per party.
+          At the minimum, a party needs to set an empty Filters message to receive any events.
+          Each key must be a valid PartyIdString (as described in ``value.proto``).
+          Required
+    description: |-
+      Used for filtering Transaction and Active Contract Set streams.
+      Determines which on-ledger events will be served to the client.
+  v1Value:
+    type: object
+    properties:
+      record:
+        $ref: '#/definitions/v1Record'
+      variant:
+        $ref: '#/definitions/v1Variant'
+      contract_id:
+        type: string
+        description: |-
+          Identifier of an on-ledger contract. Commands which reference an unknown or already archived contract ID will fail.
+          Must be a valid LedgerString.
+      list:
+        $ref: '#/definitions/v1List'
+        description: Represents a homogeneous list of values.
+      int64:
+        type: string
+        format: int64
+      decimal:
+        type: string
+        title: |-
+          A decimal value with precision 38 (38 decimal digits), of which
+          10 after the comma / period. in other words a decimal is a number
+          of the form ``x / 10^10`` where ``|x| < 10^38``.
+          The number can start with a leading sign [+-] followed by digits
+      text:
+        type: string
+        description: A string.
+      timestamp:
+        type: string
+        format: int64
+        title: |-
+          Microseconds since the UNIX epoch. Can go backwards. Fixed
+          since the vast majority of values will be greater than
+          2^28, since currently the number of microseconds since the
+          epoch is greater than that. Range: 0001-01-01T00:00:00Z to
+          9999-12-31T23:59:59.999999Z, so that we can convert to/from
+          https://www.ietf.org/rfc/rfc3339.txt
+      party:
+        type: string
+        description: |-
+          An agent operating on the ledger.
+          Must be a valid PartyIdString.
+      bool:
+        type: boolean
+        format: boolean
+        description: True or false.
+      unit:
+        properties: {}
+        description: This value is used for example for choices that don't take any arguments.
+      date:
+        type: integer
+        format: int32
+        title: |-
+          Days since the unix epoch. Can go backwards. Limited from
+          0001-01-01 to 9999-12-31, also to be compatible with
+          https://www.ietf.org/rfc/rfc3339.txt
+      optional:
+        $ref: '#/definitions/v1Optional'
+        title: 'The Optional type, None or Some'
+      map:
+        $ref: '#/definitions/v1Map'
+        title: The Map type
+      enum:
+        $ref: '#/definitions/v1Enum'
+        title: The Enum type
+    description: |-
+      Encodes values that the ledger accepts as command arguments and emits as contract arguments.
+
+      The values encoding use different four classes of strings as identifiers. Those classes are
+      defined as follow:
+      - NameStrings are strings that match the regexp ``[A-Za-z\$_][A-Za-z0-9\$_]*``.
+      - PackageIdStrings are strings that match the regexp ``[A-Za-z0-9\-_ ]+``.
+      - PartyIdStrings are strings that match the regexp ``[A-Za-z0-9:\-_ ]+``.
+      - LedgerStrings are strings that match the regexp ``[A-Za-z0-9#:\-_/ ]+``.
+  v1Variant:
+    type: object
+    properties:
+      variant_id:
+        $ref: '#/definitions/v1Identifier'
+        description: |-
+          Omitted from the transaction stream when verbose streaming is not enabled.
+          Optional when submitting commands.
+      value:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The value encoded within the Variant.
+          Required
+    description: A value with alternative representations.
+  v1Checkpoint:
+    type: object
+    properties:
+      record_time:
+        type: string
+        format: date-time
+        title: |-
+          All commands with a maximum record time below this value MUST be considered lost if their completion has not arrived before this checkpoint.
+          Required
+      offset:
+        $ref: '#/definitions/v1LedgerOffset'
+        title: |-
+          May be used in a subsequent CompletionStreamRequest to resume the consumption of this stream at a later time.
+          Required
+    description: |-
+      * detect time out of commands.
+      * provide an offset which can be used to restart consumption.
+    title: 'Checkpoints may be used to:'
+  v1Completion:
+    type: object
+    properties:
+      command_id:
+        type: string
+        title: |-
+          The ID of the succeeded or failed command.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      status:
+        $ref: '#/definitions/rpcStatus'
+        title: |-
+          Identifies the exact type of the error.
+          For example, malformed or double spend transactions will result in a ``INVALID_ARGUMENT`` status.
+          Transactions with invalid time time windows (which may be valid at a later date) will result in an ``ABORTED`` error.
+          Optional
+      transaction_id:
+        type: string
+        title: |-
+          The transaction_id of the transaction that resulted from the command with command_id.
+          Only set for successfully executed commands.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          The trace context submitted with the command.
+          This field is a future extension point and is currently not supported.
+          Optional
+    description: 'A completion represents the status of a submitted command on the ledger: it can be successful or failed.'
+  v1CompletionEndRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        description: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Required
+          Must be a valid LedgerString (as described in ``value.proto``).
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1CompletionEndResponse:
+    type: object
+    properties:
+      offset:
+        $ref: '#/definitions/v1LedgerOffset'
+        title: |-
+          This offset can be used in a CompletionStreamRequest message.
+          Required
+  v1CompletionStreamRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger id reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      application_id:
+        type: string
+        title: |-
+          Only completions of commands submitted with the same application_id will be visible in the stream.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      parties:
+        type: array
+        items:
+          type: string
+        title: |-
+          Non-empty list of parties whose data should be included.
+          Must be a valid PartyIdString (as described in ``value.proto``).
+          Required
+      offset:
+        $ref: '#/definitions/v1LedgerOffset'
+        description: |-
+          This field indicates the minimum offset for completions. This can be used to resume an earlier completion stream.
+          Optional, if not set the ledger uses the current ledger end offset instead.
+  v1CompletionStreamResponse:
+    type: object
+    properties:
+      checkpoint:
+        $ref: '#/definitions/v1Checkpoint'
+        title: |-
+          This checkpoint may be used to restart consumption.  The
+          checkpoint is after any completions in this response.
+          Optional
+      completions:
+        type: array
+        items:
+          $ref: '#/definitions/v1Completion'
+        description: 'If set, one or more completions.'
+  v1LedgerOffset:
+    type: object
+    properties:
+      absolute:
+        type: string
+        description: |-
+          Absolute values are acquired by reading the transactions in the stream.
+          The offsets can be compared. The format may vary between implementations.
+          It is either a string representing an ever-increasing integer, or
+          a composite string containing ``<block-hash>-<block-height>-<event-id>``; ordering
+          requires comparing numerical values of the second, then the third element.
+      boundary:
+        $ref: '#/definitions/LedgerOffsetLedgerBoundary'
+    description: Describes a specific point on the ledger.
+  v1ArchivedEvent:
+    type: object
+    properties:
+      event_id:
+        type: string
+        title: |-
+          The ID of this particular event.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      contract_id:
+        type: string
+        title: |-
+          The ID of the archived contract.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      template_id:
+        $ref: '#/definitions/v1Identifier'
+        title: |-
+          The template of the archived contract.
+          Required
+      witness_parties:
+        type: array
+        items:
+          type: string
+        title: |-
+          The parties that are notified of this event. For `ArchivedEvent`s,
+          these are the intersection of the stakeholders of the contract in
+          question and the parties specified in the `TransactionFilter`. The
+          stakeholders are the union of the signatories and the observers of
+          the contract.
+          Each one of its elements must be a valid PartyIdString (as descibed
+          in ``value.proto``).
+          Required
+    description: 'Records that a contract has been archived, and choices may no longer be exercised on it.'
+  v1Command:
+    type: object
+    properties:
+      create:
+        $ref: '#/definitions/v1CreateCommand'
+      exercise:
+        $ref: '#/definitions/v1ExerciseCommand'
+      exerciseByKey:
+        $ref: '#/definitions/v1ExerciseByKeyCommand'
+      createAndExercise:
+        $ref: '#/definitions/v1CreateAndExerciseCommand'
+    description: A command can either create a new contract or exercise a choice on an existing contract.
+  v1Commands:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      workflow_id:
+        type: string
+        title: |-
+          Identifier of the on-ledger workflow that this command is a part of.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      application_id:
+        type: string
+        title: |-
+          Uniquely identifies the application (or its part) that issued the command. This is used in tracing
+          across different components and to let applications subscribe to their own submissions only.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      command_id:
+        type: string
+        title: |-
+          Uniquely identified the command. This identifier should be unique for each new command within an
+          application domain. It can be used for matching the requests with their respective completions.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      party:
+        type: string
+        title: |-
+          Party on whose behalf the command should be executed. It is up to the server to verify that the
+          authorisation can be granted and that the connection has been authenticated for that party.
+          Must be a valid PartyIdString (as described in ``value.proto``).
+          Required
+      ledger_effective_time:
+        type: string
+        format: date-time
+        title: |-
+          MUST be an approximation of the wall clock time on the ledger server.
+          Required
+      maximum_record_time:
+        type: string
+        format: date-time
+        title: |-
+          The deadline for observing this command in the completion stream before it can be considered to have timed out.
+          Required
+      commands:
+        type: array
+        items:
+          $ref: '#/definitions/v1Command'
+        title: |-
+          Individual elements of this atomic command. Must be non-empty.
+          Required
+    description: A composite command that groups multiple commands together.
+  v1CreateAndExerciseCommand:
+    type: object
+    properties:
+      template_id:
+        $ref: '#/definitions/v1Identifier'
+        title: |-
+          The template of the contract the client wants to create.
+          Required
+      create_arguments:
+        $ref: '#/definitions/v1Record'
+        title: |-
+          The arguments required for creating a contract from this template.
+          Required
+      choice:
+        type: string
+        title: |-
+          The name of the choice the client wants to exercise.
+          Must be a valid NameString (as described in ``value.proto``).
+          Required
+      choice_argument:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The argument for this choice.
+          Required
+    description: Create a contract and exercise a choice on it in the same transaction.
+  v1CreateCommand:
+    type: object
+    properties:
+      template_id:
+        $ref: '#/definitions/v1Identifier'
+        title: |-
+          The template of contract the client wants to create.
+          Required
+      create_arguments:
+        $ref: '#/definitions/v1Record'
+        title: |-
+          The arguments required for creating a contract from this template.
+          Required
+    description: Create a new contract instance based on a template.
+  v1Event:
+    type: object
+    properties:
+      created:
+        $ref: '#/definitions/v1CreatedEvent'
+      archived:
+        $ref: '#/definitions/v1ArchivedEvent'
+    description: |-
+      An event in the flat transaction stream can either be the creation
+      or the archiving of a contract.
+
+      In the transaction service the events are restricted to the events
+      visible for the parties specified in the transaction filter. Each
+      event message type below contains a ``witness_parties`` field which
+      indicates the subset of the requested parties that can see the event
+      in question. In the flat transaction stream you'll only receive events
+      that have witnesses.
+  v1ExerciseByKeyCommand:
+    type: object
+    properties:
+      template_id:
+        $ref: '#/definitions/v1Identifier'
+        title: |-
+          The template of contract the client wants to exercise.
+          Required
+      contract_key:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The key of the contract the client wants to exercise upon.
+          Required
+      choice:
+        type: string
+        title: |-
+          The name of the choice the client wants to exercise.
+          Must be a valid NameString (as described in ``value.proto``)
+          Required
+      choice_argument:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The argument for this choice.
+          Required
+    description: Exercise a choice on an existing contract specified by its key.
+  v1ExerciseCommand:
+    type: object
+    properties:
+      template_id:
+        $ref: '#/definitions/v1Identifier'
+        title: |-
+          The template of contract the client wants to exercise.
+          Required
+      contract_id:
+        type: string
+        title: |-
+          The ID of the contract the client wants to exercise upon.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      choice:
+        type: string
+        title: |-
+          The name of the choice the client wants to exercise.
+          Must be a valid NameString (as described in ``value.proto``)
+          Required
+      choice_argument:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The argument for this choice.
+          Required
+    description: Exercise a choice on an existing contract.
+  v1ExercisedEvent:
+    type: object
+    properties:
+      event_id:
+        type: string
+        title: |-
+          The ID of this particular event.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      contract_id:
+        type: string
+        title: |-
+          The ID of the target contract.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      template_id:
+        $ref: '#/definitions/v1Identifier'
+        title: |-
+          The template of the target contract.
+          Required
+      choice:
+        type: string
+        title: |-
+          The choice that's been exercised on the target contract.
+          Must be a valid NameString (as described in ``value.proto``).
+          Required
+      choice_argument:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The argument the choice was made with.
+          Required
+      acting_parties:
+        type: array
+        items:
+          type: string
+        title: |-
+          The parties that made the choice.
+          Each element must be a valid PartyIdString (as described in ``value.proto``).
+          Required
+      consuming:
+        type: boolean
+        format: boolean
+        title: |-
+          If true, the target contract may no longer be exercised.
+          Required
+      witness_parties:
+        type: array
+        items:
+          type: string
+        description: |-
+          The parties that are notified of this event. The witnesses of an exercise
+          node will depend on whether the exercise was consuming or not.
+
+          If consuming, the witnesses are the union of the stakeholders and
+          the actors.
+
+          If not consuming, the witnesses are the union of the signatories and
+          the actors. Note that the actors might not necessarily be observers
+          and thus signatories. This is the case when the controllers of a
+          choice are specified using "flexible controllers", using the
+          `choice ... controller` syntax, and said controllers are not
+          explicitly marked as observers.
+
+          Each element must be a valid PartyIdString (as described in ``value.proto``).
+
+          Required
+      child_event_ids:
+        type: array
+        items:
+          type: string
+        description: |-
+          References to further events in the same transaction that appeared as a result of this ``ExercisedEvent``.
+          It contains only the immediate children of this event, not all members of the subtree rooted at this node.
+
+          Each element must be a valid PartyIdString (as described in ``value.proto``).
+
+          Optional
+      exercise_result:
+        $ref: '#/definitions/v1Value'
+        title: |-
+          The result of exercising the choice
+          Required
+    description: Records that a choice has been exercised on a target contract.
+  v1SubmitAndWaitForTransactionIdResponse:
+    type: object
+    properties:
+      transaction_id:
+        type: string
+        title: |-
+          The id of the transaction that resulted from the submitted command.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+  v1SubmitAndWaitForTransactionResponse:
+    type: object
+    properties:
+      transaction:
+        $ref: '#/definitions/v1Transaction'
+        title: |-
+          The flat transaction that resulted from the submitted command.
+          Required
+  v1SubmitAndWaitForTransactionTreeResponse:
+    type: object
+    properties:
+      transaction:
+        $ref: '#/definitions/v1TransactionTree'
+        title: |-
+          The transaction tree that resulted from the submitted command.
+          Required
+  v1SubmitAndWaitRequest:
+    type: object
+    properties:
+      commands:
+        $ref: '#/definitions/v1Commands'
+        title: |-
+          The commands to be submitted.
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+    description: 'These commands are atomic, and will become transactions.'
+  v1Transaction:
+    type: object
+    properties:
+      transaction_id:
+        type: string
+        title: |-
+          Assigned by the server. Useful for correlating logs.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      command_id:
+        type: string
+        title: |-
+          The ID of the command which resulted in this transaction. Missing for everyone except the submitting party.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      workflow_id:
+        type: string
+        title: |-
+          The workflow ID used in command submission.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      effective_at:
+        type: string
+        format: date-time
+        title: |-
+          Ledger effective time.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      events:
+        type: array
+        items:
+          $ref: '#/definitions/v1Event'
+        title: |-
+          The collection of events.
+          Only contains ``CreatedEvent`` or ``ArchivedEvent``.
+          Required
+      offset:
+        type: string
+        title: |-
+          The absolute offset. The format of this field is described in ``ledger_offset.proto``.
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Zipkin trace context.
+          This field is a future extension point and is currently not supported.
+          Optional
+    description: Filtered view of an on-ledger transaction.
+  v1TransactionTree:
+    type: object
+    properties:
+      transaction_id:
+        type: string
+        title: |-
+          Assigned by the server. Useful for correlating logs.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      command_id:
+        type: string
+        title: |-
+          The ID of the command which resulted in this transaction. Missing for everyone except the submitting party.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      workflow_id:
+        type: string
+        title: |-
+          The workflow ID used in command submission. Only set if the ``workflow_id`` for the command was set.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Optional
+      effective_at:
+        type: string
+        format: date-time
+        title: |-
+          Ledger effective time.
+          Required
+      offset:
+        type: string
+        title: |-
+          The absolute offset. The format of this field is described in ``ledger_offset.proto``.
+          Required
+      events_by_id:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/v1TreeEvent'
+        title: |-
+          Changes to the ledger that were caused by this transaction. Nodes of the transaction tree.
+          Each key be a valid LedgerString (as describe in ``value.proto``).
+          Required
+      root_event_ids:
+        type: array
+        items:
+          type: string
+        title: |-
+          Roots of the transaction tree.
+          Each element must be a valid LedgerString (as describe in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Zipkin trace context.
+          This field is a future extension point and is currently not supported.
+          Optional
+    description: Complete view of an on-ledger transaction.
+  v1TreeEvent:
+    type: object
+    properties:
+      created:
+        $ref: '#/definitions/v1CreatedEvent'
+      exercised:
+        $ref: '#/definitions/v1ExercisedEvent'
+    description: |-
+      Each tree event message type below contains a ``witness_parties`` field which
+      indicates the subset of the requested parties that can see the event
+      in question.
+
+      Note that transaction trees might contain events with
+      _no_ witness parties, which were included simply because they were
+      children of events which have witnesses.
+  v1SubmitRequest:
+    type: object
+    properties:
+      commands:
+        $ref: '#/definitions/v1Commands'
+        title: |-
+          The commands to be submitted in a single transaction.
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+    description: 'The submitted commands will be processed atomically in a single transaction. Moreover, each ``Command`` in ``commands`` will be executed in the order specified by the request.'
+  v1GetLedgerConfigurationRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetLedgerConfigurationResponse:
+    type: object
+    properties:
+      ledger_configuration:
+        $ref: '#/definitions/v1LedgerConfiguration'
+        description: The latest ledger configuration.
+  v1LedgerConfiguration:
+    type: object
+    properties:
+      min_ttl:
+        type: string
+        description: Minimum difference between ledger effective time and maximum record time in submitted commands.
+      max_ttl:
+        type: string
+        description: Maximum difference between ledger effective time and maximum record time in submitted commands.
+    description: LedgerConfiguration contains parameters of the ledger instance that may be useful to clients.
+  v1GetLedgerIdentityRequest:
+    type: object
+    properties:
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetLedgerIdentityResponse:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          The ID of the ledger exposed by the server.
+          Requests submitted with the wrong ledger ID will result in ``NOT_FOUND`` gRPC errors.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+  v1GetPackageResponse:
+    type: object
+    properties:
+      hash_function:
+        $ref: '#/definitions/v1HashFunction'
+        title: |-
+          The hash function we use to calculate the hash.
+          Required
+      archive_payload:
+        type: string
+        format: byte
+        title: |-
+          Contains a ``daml_lf`` ArchivePayload. See further details in ``daml_lf.proto``.
+          Required
+      hash:
+        type: string
+        title: |-
+          The hash of the archive payload, can also used as a ``package_id``.
+          Must be a valid PackageIdString (as described in ``value.proto``).
+          Required
+  v1GetPackageStatusRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      package_id:
+        type: string
+        title: |-
+          The ID of the requested package.
+          Must be a valid PackageIdString (as described in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetPackageStatusResponse:
+    type: object
+    properties:
+      package_status:
+        $ref: '#/definitions/v1PackageStatus'
+        description: The status of the package.
+  v1HashFunction:
+    type: string
+    enum:
+      - SHA256
+    default: SHA256
+  v1ListPackagesRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1ListPackagesResponse:
+    type: object
+    properties:
+      package_ids:
+        type: array
+        items:
+          type: string
+        title: |-
+          The IDs of all DAML-LF packages supported by the server.
+          Each element must be a valid PackageIdString (as described in ``value.proto``).
+          Required
+  v1PackageStatus:
+    type: string
+    enum:
+      - UNKNOWN
+      - REGISTERED
+    default: UNKNOWN
+    description: |2-
+       - UNKNOWN: The server is not aware of such a package.
+       - REGISTERED: The server is able to execute DAML commands operating on this package.
+  adminListKnownPackagesRequest:
+    type: object
+  adminListKnownPackagesResponse:
+    type: object
+    properties:
+      package_details:
+        type: array
+        items:
+          $ref: '#/definitions/adminPackageDetails'
+        title: |-
+          The details of all DAML-LF packages known to backing participant.
+          Required
+  adminPackageDetails:
+    type: object
+    properties:
+      package_id:
+        type: string
+        title: |-
+          The identity of the DAML-LF package.
+          Must be a valid PackageIdString (as describe in ``value.proto``).
+          Required
+      package_size:
+        type: string
+        format: uint64
+        title: |-
+          Size of the package in bytes.
+          The size of the package is given by the size of the ``daml_lf``
+          ArchivePayload. See further details in ``daml_lf.proto``.
+          Required
+      known_since:
+        type: string
+        format: date-time
+        title: |-
+          Indicates since when the package is known to the backing participant.
+          Required
+      source_description:
+        type: string
+        title: |-
+          Description provided by the backing participant describing where
+          it got the package from.
+          Optional
+  adminUploadDarFileRequest:
+    type: object
+    properties:
+      dar_file:
+        type: string
+        format: byte
+        title: |-
+          Contains a DAML archive DAR file, which in turn is a jar like zipped
+          container for ``daml_lf`` archives. See further details in
+          ``daml_lf.proto``.
+          Required
+  adminUploadDarFileResponse:
+    type: object
+    description: An empty message that is received when the upload operation succeeded.
+  adminAllocatePartyRequest:
+    type: object
+    properties:
+      party_id_hint:
+        type: string
+        title: |-
+          A hint to the backing participant what party id to allocate. It can be
+          ignored.
+          Must be a valid PartyIdString (as describe in ``value.proto``).
+          Optional
+      display_name:
+        type: string
+        title: |-
+          Human readable name of the party to be added to the participant. It doesn't
+          have to be unique.
+          Optional
+  adminAllocatePartyResponse:
+    type: object
+    properties:
+      party_details:
+        $ref: '#/definitions/adminPartyDetails'
+  adminGetParticipantIdRequest:
+    type: object
+  adminGetParticipantIdResponse:
+    type: object
+    properties:
+      participant_id:
+        type: string
+        description: |-
+          Identifier of the participant, which SHOULD be globally unique.
+          Must be a valid LedgerString (as describe in ``value.proto``).
+  adminListKnownPartiesRequest:
+    type: object
+  adminListKnownPartiesResponse:
+    type: object
+    properties:
+      party_details:
+        type: array
+        items:
+          $ref: '#/definitions/adminPartyDetails'
+        title: |-
+          The details of all DAML parties hosted by the participant.
+          Required
+  adminPartyDetails:
+    type: object
+    properties:
+      party:
+        type: string
+        title: |-
+          The stable unique identifier of a DAML party.
+          Must be a valid PartyIdString (as described in ``value.proto``).
+          Required
+      display_name:
+        type: string
+        title: |-
+          Human readable name associated with the party. Caution, it might not be
+          unique.
+          Optional
+      is_local:
+        type: boolean
+        format: boolean
+        title: |-
+          true if party is hosted by the backing participant.
+          Required
+  testingResetRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as describe in ``value.proto``).
+          Required
+  testingGetTimeRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as describe in ``value.proto``).
+          Required
+  testingGetTimeResponse:
+    type: object
+    properties:
+      current_time:
+        type: string
+        format: date-time
+        description: The current time according to the ledger server.
+  testingSetTimeRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as describe in ``value.proto``).
+          Required
+      current_time:
+        type: string
+        format: date-time
+        description: |-
+          MUST precisely match the current time as it's known to the ledger server.
+          On mismatch, an ``INVALID_PARAMETER`` gRPC error will be returned.
+      new_time:
+        type: string
+        format: date-time
+        description: |-
+          The time the client wants to set on the ledger.
+          MUST be a point int time after ``current_time``.
+  LedgerOffsetLedgerBoundary:
+    type: string
+    enum:
+      - LEDGER_BEGIN
+      - LEDGER_END
+    default: LEDGER_BEGIN
+    description: |2-
+       - LEDGER_BEGIN: Refers to the first transaction.
+       - LEDGER_END: Refers to the currently last transaction, which is a moving target.
+  v1GetFlatTransactionResponse:
+    type: object
+    properties:
+      transaction:
+        $ref: '#/definitions/v1Transaction'
+  v1GetLedgerEndRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as describe in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetLedgerEndResponse:
+    type: object
+    properties:
+      offset:
+        $ref: '#/definitions/v1LedgerOffset'
+        description: The absolute offset of the current ledger end.
+  v1GetTransactionByEventIdRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      event_id:
+        type: string
+        title: |-
+          The ID of a particular event.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      requesting_parties:
+        type: array
+        items:
+          type: string
+        title: |-
+          The parties whose events the client expects to see.
+          Events that are not visible for the parties in this collection will not be present in the response.
+          Each element must be a valid PartyIdString (as described in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetTransactionByIdRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as describe in ``value.proto``).
+          Required
+      transaction_id:
+        type: string
+        title: |-
+          The ID of a particular transaction.
+          Must be a valid LedgerString (as describe in ``value.proto``).
+          Required
+      requesting_parties:
+        type: array
+        items:
+          type: string
+        title: |-
+          The parties whose events the client expects to see.
+          Events that are not visible for the parties in this collection will not be present in the response.
+          Each element be a valid PartyIdString (as describe in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetTransactionResponse:
+    type: object
+    properties:
+      transaction:
+        $ref: '#/definitions/v1TransactionTree'
+  v1GetTransactionTreesResponse:
+    type: object
+    properties:
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/v1TransactionTree'
+        description: The list of transaction trees that matches the filter in ``GetTransactionsRequest`` for the ``GetTransactionTrees`` method.
+  v1GetTransactionsRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      begin:
+        $ref: '#/definitions/v1LedgerOffset'
+        title: |-
+          Beginning of the requested ledger section.
+          Required
+      end:
+        $ref: '#/definitions/v1LedgerOffset'
+        description: |-
+          End of the requested ledger section.
+          Optional, if not set, the stream will not terminate.
+      filter:
+        $ref: '#/definitions/v1TransactionFilter'
+        title: |-
+          Requesting parties with template filters.
+          Required
+      verbose:
+        type: boolean
+        format: boolean
+        title: |-
+          If enabled, values served over the API will contain more information than strictly necessary to interpret the data.
+          In particular, setting the verbose flag to true triggers the ledger to include labels for record fields.
+          Optional
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+  v1GetTransactionsResponse:
+    type: object
+    properties:
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/v1Transaction'
+        description: The list of transactions that matches the filter in GetTransactionsRequest for the GetTransactions method.
+  v1GetPackageRequest:
+    type: object
+    properties:
+      ledger_id:
+        type: string
+        title: |-
+          Must correspond to the ledger ID reported by the Ledger Identification Service.
+          Must be a valid LedgerString (as described in ``value.proto``).
+          Required
+      package_id:
+        type: string
+        title: |-
+          The ID of the requested package.
+          Must be a valid PackageIdString (as described in ``value.proto``).
+          Required
+      trace_context:
+        $ref: '#/definitions/v1TraceContext'
+        title: |-
+          Server side tracing will be registered as a child of the submitted context.
+          This field is a future extension point and is currently not supported.
+          Optional
+x-stream-definitions:
+  v1GetActiveContractsResponse:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/v1GetActiveContractsResponse'
+      error:
+        $ref: '#/definitions/runtimeStreamError'
+    title: Stream result of v1GetActiveContractsResponse
+  v1CompletionStreamResponse:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/v1CompletionStreamResponse'
+      error:
+        $ref: '#/definitions/runtimeStreamError'
+    title: Stream result of v1CompletionStreamResponse
+  v1GetLedgerConfigurationResponse:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/v1GetLedgerConfigurationResponse'
+      error:
+        $ref: '#/definitions/runtimeStreamError'
+    title: Stream result of v1GetLedgerConfigurationResponse
+  testingGetTimeResponse:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/testingGetTimeResponse'
+      error:
+        $ref: '#/definitions/runtimeStreamError'
+    title: Stream result of testingGetTimeResponse
+  v1GetTransactionTreesResponse:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/v1GetTransactionTreesResponse'
+      error:
+        $ref: '#/definitions/runtimeStreamError'
+    title: Stream result of v1GetTransactionTreesResponse
+  v1GetTransactionsResponse:
+    type: object
+    properties:
+      result:
+        $ref: '#/definitions/v1GetTransactionsResponse'
+      error:
+        $ref: '#/definitions/runtimeStreamError'
+    title: Stream result of v1GetTransactionsResponse
