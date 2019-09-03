@@ -1,0 +1,38 @@
+digraph G {
+compound=true;
+rankdir=LR;
+subgraph cluster_IouTrade{
+n0[label=Create][color=green]; 
+n1[label=Archive][color=red]; 
+n2[label=IouTrade_Accept][color=red]; 
+n3[label=TradeProposal_Reject][color=red]; 
+label=IouTrade;color=blue
+}subgraph cluster_Iou{
+n4[label=Create][color=green]; 
+n5[label=Archive][color=red]; 
+n6[label=Iou_Split][color=red]; 
+n7[label=Iou_Merge][color=red]; 
+n8[label=Iou_Transfer][color=red]; 
+n9[label=Iou_AddObserver][color=red]; 
+n10[label=Iou_RemoveObserver][color=red]; 
+label=Iou;color=blue
+}subgraph cluster_IouTransfer{
+n11[label=Create][color=green]; 
+n12[label=Archive][color=red]; 
+n13[label=IouTransfer_Cancel][color=red]; 
+n14[label=IouTransfer_Reject][color=red]; 
+n15[label=IouTransfer_Accept][color=red]; 
+label=IouTransfer;color=blue
+}n2->n8
+n2->n15
+n6->n4
+n7->n4
+n7->n5
+n8->n11
+n9->n4
+n10->n4
+n13->n4
+n14->n4
+n15->n4
+
+}
